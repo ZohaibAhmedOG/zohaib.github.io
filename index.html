@@ -5,27 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chat</title>
     <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --sidebar-bg: #f4f4f4;
+            --button-bg: #007bff;
+            --button-text: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1e1e1e;
+            --text-color: #ffffff;
+            --sidebar-bg: #2a2a2a;
+            --button-bg: #0056b3;
+            --button-text: #ffffff;
+        }
+
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
-            background-color: #f4f4f4;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
-        .chat-container {
-            width: 400px;
-            background: white;
+
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
+            position: fixed;
+            left: -250px;
+            top: 0;
+            height: 100%;
+            transition: left 0.3s;
+        }
+        .sidebar.open {
+            left: 0;
+        }
+        .sidebar button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            background: var(--button-bg);
+            color: var(--button-text);
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        select, button {
+            padding: 10px;
+            border: none;
+            background: var(--button-bg);
+            color: var(--button-text);
+            cursor: pointer;
+            border-radius: 5px;
         }
         .messages {
-            height: 300px;
+            height: 400px;
             overflow-y: auto;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
             margin-bottom: 10px;
+            border-radius: 10px;
         }
         .input-container {
             display: flex;
@@ -36,19 +93,28 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-        button {
-            padding: 10px;
-            border: none;
-            background: #007bff;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: 10px;
-        }
     </style>
 </head>
-<body>
-    <div class="chat-container">
+<body data-theme="light">
+    <div class="sidebar" id="sidebar">
+        <button onclick="newChat()">New Chat</button>
+        <div id="chat-history">No history yet</div>
+    </div>
+    
+    <div class="content">
+        <div class="header">
+            <button onclick="toggleSidebar()">☰</button>
+            <select id="model-select">
+                <option value="o3-mini">o3-mini</option>
+                <option value="o1">o1</option>
+                <option value="4o-mini">4o-mini</option>
+                <option value="llama3.3">Llama 3.3</option>
+                <option value="claude3.5">Claude 3.5</option>
+                <option value="mistral">Mistral</option>
+            </select>
+            <button onclick="toggleTheme()">🌙</button>
+        </div>
+        
         <div class="messages" id="messages"></div>
         <div class="input-container">
             <input type="text" id="user-input" placeholder="Type a message...">
@@ -57,23 +123,29 @@
     </div>
     
     <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("open");
+        }
+        
+        function toggleTheme() {
+            let body = document.body;
+            let theme = body.getAttribute("data-theme");
+            body.setAttribute("data-theme", theme === "dark" ? "light" : "dark");
+        }
+        
         function sendMessage() {
             const input = document.getElementById("user-input");
             const message = input.value.trim();
             if (message === "") return;
-
             const messagesDiv = document.getElementById("messages");
             const userMessage = document.createElement("div");
             userMessage.textContent = "You: " + message;
             messagesDiv.appendChild(userMessage);
-
-            // Placeholder AI response
             setTimeout(() => {
                 const aiMessage = document.createElement("div");
                 aiMessage.textContent = "AI: Thinking...";
                 messagesDiv.appendChild(aiMessage);
             }, 500);
-
             input.value = "";
         }
     </script>
